@@ -1,463 +1,176 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Isle's Echo Shop</title>
-<style>
-  :root{
-    --bg:#151515;
-    --panel:#222;
-    --panel-2:#2a2a2a;
-    --brand:#23784e;
-    --brand-2:#2ea565;
-    --text:#f4f4f4;
-    --muted:#a8b3ac;
-    --accent:#93f5b5;
-    --danger:#ff6363;
-    --shadow:0 12px 30px rgba(0,0,0,.35);
-    --radius:14px;
-  }
-
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    background: radial-gradient(1200px 600px at 50% -200px, #1b3b2c 0%, #173427 28%, var(--bg) 65%);
-    color:var(--text);
-    overflow-x:hidden;
-  }
-
-  /* ====== HEADER with vines ====== */
-  .hero{
-    position:relative;
-    padding:28px 20px 18px;
-    background: linear-gradient(180deg, rgba(29,86,58,.65), rgba(29,86,58,.35) 40%, transparent);
-    border-bottom:1px solid rgba(255,255,255,.06);
-    overflow:hidden;
-  }
-  .hero-inner{
-    max-width:1200px; margin:0 auto;
-    display:flex; align-items:center; gap:16px; justify-content:space-between;
-  }
-  .brand{
-    display:flex; align-items:center; gap:14px;
-    user-select:none;
-  }
-  .brand h1{
-    margin:0; letter-spacing:.02em;
-    font-size: clamp(22px, 3.2vw, 36px);
-    font-weight:800;
-    text-shadow:0 2px 10px rgba(0,0,0,.35);
-  }
-  .badge{
-    font-size:14px; padding:6px 10px; border-radius:10px;
-    background:rgba(255,255,255,.08); color:#dff7ea; border:1px solid rgba(255,255,255,.12)
-  }
-
-  /* vines */
-  .vines{
-    position:absolute; inset:0; pointer-events:none; overflow:visible;
-  }
-  .vine{
-    position:absolute; top:-40px;
-    width:220px; height:220px;
-    opacity:.8; filter: drop-shadow(0 8px 10px rgba(0,0,0,.35));
-    will-change: transform;
-  }
-  .vine svg{width:100%; height:100%}
-  .vine:nth-child(1){left:2%; transform-origin:20% 0}
-  .vine:nth-child(2){left:14%; transform-origin:40% 0; opacity:.9}
-  .vine:nth-child(3){left:28%; transform-origin:60% 0}
-  .vine:nth-child(4){left:70%; transform-origin:50% 0}
-  .vine:nth-child(5){left:86%; transform-origin:70% 0; opacity:.85}
-
-  /* ===== Controls row ===== */
-  .controls{
-    max-width:1200px; margin:16px auto 6px; padding:0 16px;
-    display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center;
-  }
-
-  .btn, .seg{
-    background:var(--panel-2); color:var(--text);
-    border:1px solid rgba(255,255,255,.08);
-    padding:10px 14px; border-radius:12px; cursor:pointer;
-    transition: transform .14s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
-    box-shadow:0 6px 16px rgba(0,0,0,.2);
-    font-weight:600; font-size:14px; letter-spacing:.02em;
-  }
-  .btn:hover{ transform: translateY(-2px); border-color: rgba(147,245,181,.45) }
-  .btn.active{ background: linear-gradient(180deg, var(--brand), var(--brand-2)); border-color: transparent; box-shadow: 0 10px 24px rgba(46,165,101,.35) }
-
-  .seg{ padding:8px 10px; opacity:.9 }
-  .seg.active{ background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16) }
-
-  .search{
-    min-width:240px; max-width:340px; flex:1 1 240px;
-    background:var(--panel); color:var(--text);
-    border:1px solid rgba(255,255,255,.08);
-    padding:11px 12px; border-radius:12px; outline:none;
-    box-shadow: var(--shadow);
-  }
-
-  .select{
-    background:var(--panel-2); color:var(--text);
-    border:1px solid rgba(255,255,255,.1);
-    padding:10px 12px; border-radius:12px;
-    box-shadow:0 6px 16px rgba(0,0,0,.18);
-  }
-
-  /* ===== Grid of cards ===== */
-  .grid{
-    max-width:1200px; margin:22px auto 80px; padding:0 16px;
-    display:grid; gap:18px;
-    grid-template-columns: repeat(auto-fill,minmax(240px,1fr));
-  }
-  .card{
-    background: linear-gradient(180deg, #222 0%, #212121 100%);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius: var(--radius);
-    padding:18px;
-    box-shadow: var(--shadow);
-    transform: translateY(0);
-    animation: cardIn .35s ease both;
-  }
-  @keyframes cardIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
-
-  .card h3{
-    margin:0 0 10px; font-size:18px; line-height:1.25; letter-spacing:.01em;
-  }
-  .muted{ color:var(--muted); font-size:13px; margin:2px 0 10px }
-  .variant{
-    width:100%; background:#2b2b2b; color:#fff;
-    border:1px solid rgba(255,255,255,.1); border-radius:10px;
-    padding:10px; margin-top:6px;
-  }
-  .price{
-    margin:12px 0 4px; font-weight:800; color:var(--accent); font-size:18px; letter-spacing:.02em;
-    text-shadow:0 2px 12px rgba(147,245,181,.15);
-  }
-  .buy{
-    width:100%;
-    margin-top:10px;
-    background: linear-gradient(180deg, var(--brand), var(--brand-2));
-    border:none; color:#072;
-    color:#eafff2; font-weight:800; letter-spacing:.02em;
-    padding:11px 14px; border-radius:12px; cursor:pointer;
-    box-shadow: 0 10px 22px rgba(46,165,101,.28);
-    transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
-  }
-  .buy:hover{ transform: translateY(-2px); filter: brightness(1.05) }
-  .buy:active{ transform: translateY(0) scale(.98) }
-
-  /* ===== Modal ===== */
-  .modal{
-    position:fixed; inset:0; display:none; place-items:center;
-    background:rgba(0,0,0,.55); backdrop-filter: blur(2px); z-index:30;
-    animation: fade .25s ease both;
-  }
-  @keyframes fade{from{opacity:0}to{opacity:1}}
-  .sheet{
-    width:min(520px, 92vw);
-    background: linear-gradient(180deg,#222,#1f1f1f);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:18px; padding:22px;
-    box-shadow:0 24px 60px rgba(0,0,0,.45);
-    transform: translateY(10px);
-    animation: rise .25s ease .05s both;
-  }
-  @keyframes rise{to{transform:translateY(0)}}
-  .sheet h2{ margin:0 0 12px; font-size:22px }
-  .sheet .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  .ghost{
-    background:transparent; border:1px solid rgba(255,255,255,.15);
-    color:#e8fff2; padding:10px 14px; border-radius:10px; cursor:pointer;
-  }
-  .confirm{
-    background: linear-gradient(180deg, var(--brand), var(--brand-2));
-    border:none; color:#fff; padding:10px 16px; border-radius:10px; cursor:pointer;
-    box-shadow: 0 10px 22px rgba(46,165,101,.28);
-    font-weight:800;
-  }
-
-  /* small helper */
-  .foot-note{ color:#9bb3a8; font-size:12px; margin-top:8px }
-</style>
+  <meta charset="UTF-8">
+  <title>Isle's Echo Shop</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+    }
+    header {
+      position: relative;
+      background: linear-gradient(to bottom, #2e7d32, #1b5e20);
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+      overflow: hidden;
+    }
+    .liana {
+      position: absolute;
+      top: 0;
+      width: 4px;
+      height: 150px;
+      background: green;
+      border-radius: 2px;
+      transform-origin: top;
+    }
+    .shop {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background: #222;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    }
+    .price {
+      color: #4caf50;
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    button {
+      background: #2e7d32;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #43a047;
+    }
+    select {
+      margin-top: 10px;
+      padding: 5px;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-
-  <!-- Header with swaying vines -->
-  <header class="hero">
-    <div class="vines" aria-hidden="true">
-      <!-- simple leafy SVG path repeated -->
-      <div class="vine">
-        <svg viewBox="0 0 200 200" fill="none">
-          <path d="M110 0 C90 40 80 70 90 100 C100 130 90 150 70 180" stroke="#6fd8a0" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="70" cy="180" r="10" fill="#2ea565"/>
-          <circle cx="100" cy="120" r="9" fill="#2ea565"/>
-        </svg>
-      </div>
-      <div class="vine">
-        <svg viewBox="0 0 200 200" fill="none">
-          <path d="M90 0 C70 45 60 80 70 110 C80 140 65 160 45 185" stroke="#7ff0b6" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="45" cy="185" r="10" fill="#2ea565"/>
-          <circle cx="75" cy="130" r="8" fill="#2ea565"/>
-        </svg>
-      </div>
-      <div class="vine">
-        <svg viewBox="0 0 200 200" fill="none">
-          <path d="M110 0 C120 35 110 70 95 100 C80 130 85 150 100 180" stroke="#68d39a" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="100" cy="180" r="10" fill="#2ea565"/>
-          <circle cx="100" cy="120" r="8" fill="#2ea565"/>
-        </svg>
-      </div>
-      <div class="vine">
-        <svg viewBox="0 0 200 200" fill="none">
-          <path d="M90 0 C85 40 95 70 110 100 C125 130 120 150 105 180" stroke="#73e3aa" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="105" cy="180" r="10" fill="#2ea565"/>
-          <circle cx="112" cy="135" r="8" fill="#2ea565"/>
-        </svg>
-      </div>
-      <div class="vine">
-        <svg viewBox="0 0 200 200" fill="none">
-          <path d="M80 0 C60 35 55 70 70 105 C85 140 70 160 55 185" stroke="#6bd8a1" stroke-width="4" stroke-linecap="round"/>
-          <circle cx="55" cy="185" r="10" fill="#2ea565"/>
-          <circle cx="72" cy="140" r="8" fill="#2ea565"/>
-        </svg>
-      </div>
-    </div>
-
-    <div class="hero-inner">
-      <div class="brand">
-        <span class="badge">🦖</span>
-        <h1>Isle's Echo Shop</h1>
-      </div>
-      <div class="brand">
-        <select id="currency" class="select" title="Валюта">
-          <option value="RUB">RUB</option>
-          <option value="UAH">UAH</option>
-          <option value="USD">USD</option>
-        </select>
-      </div>
-    </div>
+  <header>
+    Isle's Echo Shop
+    <div class="liana" style="left:20%;"></div>
+    <div class="liana" style="left:40%;"></div>
+    <div class="liana" style="left:60%;"></div>
+    <div class="liana" style="left:80%;"></div>
   </header>
 
-  <!-- Controls -->
-  <div class="controls">
-    <button class="btn active" data-type="all">Все</button>
-    <button class="btn" data-type="herbivore">🌿 Травоядные</button>
-    <button class="btn" data-type="carnivore">🍖 Плотоядные</button>
+  <div class="shop" id="shop"></div>
 
-    <button class="seg active" data-tier="all">Все тиры</button>
-    <button class="seg" data-tier="1">Тир 1</button>
-    <button class="seg" data-tier="2">Тир 2</button>
-    <button class="seg" data-tier="3">Тир 3</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+  <script>
+    // 🔑 ДАННЫЕ FREEKASSA (замени на свои!)
+    const SHOP_ID = "YOUR_SHOP_ID";
+    const SECRET_KEY_1 = "YOUR_SECRET_KEY_1";
 
-    <input id="search" class="search" type="search" placeholder="Поиск динозавра…">
-  </div>
+    // 🦖 Динозавры
+    const dinosaurs = [
+      { name: "Herrerasaurus", prices: { "Default": 25 } },
+      { name: "Austroraptor", prices: { "Default": 25 } },
+      { name: "Utahraptor", prices: { "Default": 55 } },
+      { name: "Dilophosaurus", prices: { "Default": 65 } },
+      { name: "Ceratosaurus", prices: { "Male": 110, "Female": 120 } },
+      { name: "Allosaurus", prices: { "Male": 150, "Female": 160 } },
+      { name: "Baryonyx", prices: { "Male": 85, "Female": 95 } },
+      { name: "Carnotaurus", prices: { "Male": 110, "Female": 115 } },
+      { name: "Suchomimus", prices: { "Male": 150, "Female": 155 } },
+      { name: "Albertosaurus", prices: { "Default": 220 } },
+      { name: "Acrocanthosaurus", prices: { "Male": 190, "Female": 200 } },
+      { name: "Tyrannosaurus (Subadult)", prices: { "Male": 220, "Female": 230 } },
+      { name: "Tyrannosaurus (Feathered)", prices: { "Default": 350 } },
+      { name: "Spinosaurus", prices: { "Male": 220, "Female": 240 } },
+      { name: "Giganotosaurus", prices: { "Male": 210, "Female": 225 } },
+      { name: "Shantungosaurus", prices: { "Male": 245, "Female": 310 } }
+    ];
 
-  <!-- Grid -->
-  <section id="grid" class="grid" aria-live="polite"></section>
+    // 🎨 Рендер магазина
+    const shop = document.getElementById("shop");
+    dinosaurs.forEach((dino, index) => {
+      const card = document.createElement("div");
+      card.className = "card";
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="sheet">
-      <div class="row" style="justify-content:space-between; align-items:flex-start">
-        <h2 id="mTitle">Покупка</h2>
-        <button id="mClose" class="ghost">Закрыть ✕</button>
-      </div>
-      <p class="muted" id="mNote"></p>
-      <div class="row" style="margin-top:8px">
-        <select id="mVariant" class="variant"></select>
-        <div class="price" id="mPrice"></div>
-      </div>
-      <div class="row" style="justify-content:flex-end; margin-top:10px">
-        <button id="mCancel" class="ghost">Отмена</button>
-        <button id="mBuy" class="confirm">Подтвердить</button>
-      </div>
-      <div class="foot-note">После подтверждения откроется обработка заказа (здесь — демо-алерт).</div>
-    </div>
-  </div>
+      // селект с вариантами
+      const select = document.createElement("select");
+      for (let variant in dino.prices) {
+        let opt = document.createElement("option");
+        opt.value = dino.prices[variant];
+        opt.textContent = `${variant} - ${dino.prices[variant]} RUB`;
+        select.appendChild(opt);
+      }
 
-<script>
-/* ================== Data ================== */
-const dinos = [
-  // Herbivores
-  {name:"Dryosaurus",type:"herbivore",tier:1,variants:[{v:"Default",p:25}]},
-  {name:"Avaceratops",type:"herbivore",tier:1,variants:[{v:"Default",p:30}]},
-  {name:"Gallimimus",type:"herbivore",tier:1,variants:[{v:"Default",p:45}]},
+      const price = document.createElement("div");
+      price.className = "price";
+      price.textContent = `Цена: ${select.value} RUB`;
 
-  {name:"Maiasaura",type:"herbivore",tier:2,variants:[{v:"Male",p:90},{v:"Female",p:130}]},
-  {name:"Diabloceratops",type:"herbivore",tier:2,variants:[{v:"Male",p:110},{v:"Female",p:165}]},
-  {name:"Pachycephalosaurus",type:"herbivore",tier:2,variants:[{v:"Male",p:40},{v:"Female",p:90}]},
+      select.addEventListener("change", () => {
+        price.textContent = `Цена: ${select.value} RUB`;
+      });
 
-  {name:"Stegosaurus",type:"herbivore",tier:3,variants:[{v:"Male",p:210},{v:"Female",p:275}]},
-  {name:"Ankylosaurus",type:"herbivore",tier:3,variants:[{v:"Male",p:190},{v:"Female",p:255}]},
-  {name:"Therizinosaurus",type:"herbivore",tier:3,variants:[{v:"Male",p:225},{v:"Female",p:290}]},
-  {name:"Triceratops",type:"herbivore",tier:3,variants:[{v:"Male",p:235},{v:"Female",p:295}]},
-  {name:"Shantungosaurus",type:"herbivore",tier:3,variants:[{v:"Male",p:245},{v:"Female",p:310}]},
-  {name:"Camarasaurus",type:"herbivore",tier:3,variants:[{v:"Default",p:340}]},
-  {name:"Puertasaurus",type:"herbivore",tier:3,variants:[{v:"Default",p:445}]},
+      const button = document.createElement("button");
+      button.textContent = "Купить";
+      button.onclick = () => pay(Date.now(), select.value);
 
-  // Carnivores
-  {name:"Herrerasaurus",type:"carnivore",tier:1,variants:[{v:"Default",p:25}]},
-  {name:"Austroraptor",type:"carnivore",tier:1,variants:[{v:"Default",p:25}]},
-  {name:"Utahraptor",type:"carnivore",tier:1,variants:[{v:"Default",p:55}]},
-  {name:"Dilophosaurus",type:"carnivore",tier:1,variants:[{v:"Default",p:65}]},
+      card.innerHTML = `<h3>${dino.name}</h3>`;
+      card.appendChild(select);
+      card.appendChild(price);
+      card.appendChild(button);
 
-  {name:"Ceratosaurus",type:"carnivore",tier:2,variants:[{v:"Male",p:110},{v:"Female",p:150}]},
-  {name:"Allosaurus",type:"carnivore",tier:2,variants:[{v:"Male",p:150},{v:"Female",p:190}]},
-  {name:"Baryonyx",type:"carnivore",tier:2,variants:[{v:"Male",p:85},{v:"Female",p:125}]},
-  {name:"Carnotaurus",type:"carnivore",tier:2,variants:[{v:"Male",p:110},{v:"Female",p:180}]},
-  {name:"Suchomimus",type:"carnivore",tier:2,variants:[{v:"Male",p:150},{v:"Female",p:190}]},
-  {name:"Albertosaurus",type:"carnivore",tier:2,variants:[{v:"Default",p:220}]},
+      shop.appendChild(card);
+    });
 
-  {name:"Acrocanthosaurus",type:"carnivore",tier:3,variants:[{v:"Male",p:190},{v:"Female",p:260}]},
-  {name:"Tyrannosaurus (Subadult)",type:"carnivore",tier:3,variants:[{v:"Male",p:220},{v:"Female",p:300}]},
-  {name:"Tyrannosaurus (Feathered)",type:"carnivore",tier:3,variants:[{v:"Default",p:350}]},
-  {name:"Spinosaurus",type:"carnivore",tier:3,variants:[{v:"Male",p:220},{v:"Female",p:320}]},
-  {name:"Giganotosaurus",type:"carnivore",tier:3,variants:[{v:"Male",p:210},{v:"Female",p:300}]}
-];
+    // 💳 Оплата FreeKassa
+    function pay(orderId, amount) {
+      const signature = md5(`${SHOP_ID}:${amount}:${SECRET_KEY_1}:${orderId}`);
 
-/* ================== Currency ================== */
-let rates = { RUB:1, UAH:0.42, USD:0.011 }; // fallback
-const currencySel = document.getElementById('currency');
+      const form = document.createElement("form");
+      form.method = "GET";
+      form.action = "https://pay.freekassa.ru/";
 
-async function refreshRates(){
-  try{
-    const res = await fetch('https://api.exchangerate.host/latest?base=RUB&symbols=RUB,UAH,USD',{cache:'no-store'});
-    if(!res.ok) throw new Error('network');
-    const data = await res.json();
-    if(data && data.rates){
-      rates.RUB = data.rates.RUB ?? 1;
-      rates.UAH = data.rates.UAH ?? rates.UAH;
-      rates.USD = data.rates.USD ?? rates.USD;
+      form.innerHTML = `
+        <input type="hidden" name="m" value="${SHOP_ID}">
+        <input type="hidden" name="oa" value="${amount}">
+        <input type="hidden" name="o" value="${orderId}">
+        <input type="hidden" name="s" value="${signature}">
+      `;
+
+      document.body.appendChild(form);
+      form.submit();
     }
-  }catch(e){
-    // keep fallback
-  }finally{
-    render();
-  }
-}
-refreshRates();
-setInterval(refreshRates, 30*60*1000);
 
-/* ================== Filters & Rendering ================== */
-const grid = document.getElementById('grid');
-const search = document.getElementById('search');
-let currentType = 'all';
-let currentTier = 'all';
-let modalState = { dino:null };
-
-function money(v){
-  const cur = currencySel.value;
-  return (v * (rates[cur] || 1)).toFixed(2) + ' ' + cur;
-}
-
-function card(d){
-  const el = document.createElement('article');
-  el.className = 'card';
-
-  el.innerHTML = `
-    <h3>${d.name}</h3>
-    <div class="muted">${d.type==='herbivore'?'Травоядный':'Плотоядный'} • Тир ${d.tier}</div>
-    <select class="variant" aria-label="Выбрать вариант">
-      ${d.variants.map(v=>`<option value="${v.p}">${v.v} - ${money(v.p)}</option>`).join('')}
-    </select>
-    <div class="price">Цена: <span class="pval">${money(d.variants[0].p)}</span></div>
-    <button class="buy">Купить</button>
-  `;
-
-  const select = el.querySelector('select');
-  const pval = el.querySelector('.pval');
-  const update = ()=>{ pval.textContent = money(parseFloat(select.value||0)); }
-  select.addEventListener('change', update);
-  currencySel.addEventListener('change', update);
-
-  el.querySelector('.buy').addEventListener('click', ()=>{
-    openModal(d, select.selectedIndex);
-  });
-
-  return el;
-}
-
-function render(){
-  grid.innerHTML = '';
-  const q = (search.value||'').trim().toLowerCase();
-  dinos.forEach(d=>{
-    if(currentType!=='all' && d.type!==currentType) return;
-    if(currentTier!=='all' && String(d.tier)!==String(currentTier)) return;
-    if(q && !d.name.toLowerCase().includes(q)) return;
-    grid.appendChild(card(d));
-  });
-}
-
-/* ================== Controls wiring ================== */
-document.querySelectorAll('.btn[data-type]').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    document.querySelectorAll('.btn[data-type]').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    currentType = b.dataset.type;
-    render();
-  });
-});
-document.querySelectorAll('.seg[data-tier]').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    document.querySelectorAll('.seg[data-tier]').forEach(x=>x.classList.remove('active'));
-    b.classList.add('active');
-    currentTier = b.dataset.tier;
-    render();
-  });
-});
-search.addEventListener('input', render);
-currencySel.addEventListener('change', render);
-
-/* ================== Modal ================== */
-const modal = document.getElementById('modal');
-const mTitle = document.getElementById('mTitle');
-const mNote  = document.getElementById('mNote');
-const mVariant = document.getElementById('mVariant');
-const mPrice = document.getElementById('mPrice');
-const mClose = document.getElementById('mClose');
-const mCancel = document.getElementById('mCancel');
-const mBuy = document.getElementById('mBuy');
-
-function openModal(dino, variantIndex=0){
-  modalState.dino = dino;
-  mTitle.textContent = dino.name;
-  mNote.textContent = `${dino.type==='herbivore'?'Травоядный':'Плотоядный'} • Тир ${dino.tier}`;
-  mVariant.innerHTML = dino.variants.map((v,i)=>`<option value="${v.p}" ${i===variantIndex?'selected':''}>${v.v} - ${money(v.p)}</option>`).join('');
-  const upd=()=> mPrice.textContent = money(parseFloat(mVariant.value||0));
-  upd();
-  mVariant.onchange = upd;
-
-  modal.style.display='grid';
-}
-function closeModal(){ modal.style.display='none'; }
-mClose.onclick = mCancel.onclick = closeModal;
-mBuy.onclick = ()=>{
-  const d = modalState.dino;
-  if(!d) return closeModal();
-  const text = mVariant.options[mVariant.selectedIndex].text.split(' - ')[0];
-  alert(`Покупка оформлена:\n${d.name} (${text}) за ${mPrice.textContent}`);
-  closeModal();
-};
-modal.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
-
-/* ================== Vines parallax ================== */
-const vineEls = Array.from(document.querySelectorAll('.vine'));
-window.addEventListener('mousemove', (e)=>{
-  const cx = window.innerWidth/2, cy = 120;
-  const dx = (e.clientX - cx) / cx;
-  const dy = (e.clientY - cy) / 300;
-  vineEls.forEach((v,i)=>{
-    const amp = 6 + i*2;
-    v.style.transform = `translateY(${dy*amp}px) rotate(${dx*amp*0.4}deg)`;
-  });
-});
-
-/* first render */
-render();
-</script>
+    // 🌿 Анимация лиан
+    const lianas = document.querySelectorAll(".liana");
+    document.addEventListener("mousemove", (e) => {
+      const x = e.clientX / window.innerWidth;
+      lianas.forEach((liana, i) => {
+        const offset = (x - 0.5) * (i + 1) * 20;
+        liana.style.transform = `rotate(${offset}deg)`;
+      });
+    });
+  </script>
 </body>
 </html>
